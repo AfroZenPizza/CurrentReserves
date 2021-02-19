@@ -1,0 +1,33 @@
+from os import system
+import requests
+import re
+import time
+
+# CONFIGURATION
+# source  : is the url that points to where the MW level can be found
+# pattern : is a regular expression that is used to pull the data
+#           group 1 should contain the raw mw number
+source  = 'http://www.ercot.com/content/alerts/operating_reserves.js'
+pattern = "reserves.prc = '(.*)';"
+
+# Let's buuild that regular expression for future use
+regex = re.compile(pattern)
+# Clear the current Console Buffer - This is windows only... change as needed
+system('cls')
+
+
+# Make a useless function that can be repeated to get the current level
+def getCurrentReserves():
+  # Get the data we're going to work with
+  # In this case it is some kind of half-baked Javascript file that is dynamically
+  # created... Restful? No. Static content? No. Pulled when the page loads...
+  # Whatever... Enough bitching
+  response = requests.get(source)
+  results = regex.search(response.text)[1]
+  print("                                     ", end="\r")
+  print("Current: " + results, end='\r')
+
+# Constantly repeat previous useless function until... Well.. Forever
+while True:
+  getCurrentReserves()
+  time.sleep(30)
